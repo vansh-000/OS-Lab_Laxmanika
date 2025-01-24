@@ -25,12 +25,13 @@ int main()
 {
     // AT. pNo. BT  CT TAT WT
     vector<vector<int>> arr = {
-        {6, 1, 4, 0, 0, 0},
-        {2, 2, 5, 0, 0, 0},
-        {3, 3, 3, 0, 0, 0},
-        {1, 4, 1, 0, 0, 0},
-        {4, 5, 2, 0, 0, 0},
-        {5, 6, 6, 0, 0, 0}};
+        {6, 1, 1, 0, 0, 0},
+        {3, 2, 3, 0, 0, 0},
+        {6, 3, 6, 0, 0, 0},
+        {5, 4, 5, 0, 0, 0},
+        {2, 5, 2, 0, 0, 0},
+        {1, 6, 1, 0, 0, 0}};
+
     // sort the vector
     sort(arr.begin(), arr.end());
 
@@ -43,6 +44,7 @@ int main()
     }
     // sort the vector
     sort(arr.begin(), arr.end());
+
     // print the vector
     for (int i = 0; i < arr.size(); i++)
     {
