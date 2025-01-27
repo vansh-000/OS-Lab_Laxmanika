@@ -1,7 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-//  recursively scheduling arr
 void schedulearr(vector<vector<int>> &arr, int n, int &done, int currentTime)
 {
     if (done == n)
@@ -36,7 +35,7 @@ void calculateSchedule(vector<vector<int>> &arr, int index)
 
 int main()
 {
-    // AT. pNo. BT  CT TAT WT
+    // pNo. AT. BT  CT TAT WT
     vector<vector<int>> arr = {
         {1, 6, 1, 0, 0, 0},
         {2, 3, 3, 0, 0, 0},
@@ -47,11 +46,9 @@ int main()
 
     int n = arr.size();
 
-    // Sort arr by Burst Time, then by Arrival Time
     sort(arr.begin(), arr.end(), [](const vector<int> &a, const vector<int> &b)
          { return (a[2] < b[2]) || (a[2] == b[2] && a[1] < b[1]); });
 
-    // Find the process with the earliest arrival time after sorting
     int firstProcessIndex = 0;
     int min = 100;
     for (int i = 0; i < n; i++)
@@ -65,10 +62,8 @@ int main()
 
     calculateSchedule(arr, firstProcessIndex);
 
-    // sort on the basis of process number
     sort(arr.begin(), arr.end());
 
-    // Print Process Table
     for (int i = 0; i < arr.size(); i++)
     {
         for (int j = 0; j < 6; j++)
