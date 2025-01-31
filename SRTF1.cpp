@@ -6,7 +6,7 @@ void srtfScheduling(vector<vector<int>> &arr)
     int n = arr.size();
     vector<int> remainingTime(n);
     for (int i = 0; i < n; i++)
-        remainingTime[i] = arr[i][2];
+        remainingTime[i] = arr[i][2]; 
 
     int complete = 0, currentTime = 0, minRemainingTime = INT_MAX;
     int shortest = -1, finishTime;
@@ -42,9 +42,9 @@ void srtfScheduling(vector<vector<int>> &arr)
             found = false;
 
             finishTime = currentTime + 1;
-            arr[shortest][3] = finishTime;  // Completion time
-            arr[shortest][4] = arr[shortest][3] - arr[shortest][1]; // Turnaround time
-            arr[shortest][5] = arr[shortest][4] - arr[shortest][2]; // Waiting time
+            arr[shortest][3] = finishTime + arr[shortest][6];
+            arr[shortest][4] = arr[shortest][3] - arr[shortest][1];
+            arr[shortest][5] = arr[shortest][4] - arr[shortest][2];
         }
 
         currentTime++;
@@ -53,14 +53,12 @@ void srtfScheduling(vector<vector<int>> &arr)
 
 int main()
 {
-    // pNo,AT, BT, CT, TAT, WT
+    // pNo, AT, BT, CT, TAT, WT, I/O Time
     vector<vector<int>> arr = {
-        {1, 3, 4, 0, 0, 0},
-        {2, 4, 2, 0, 0, 0},
-        {3, 5, 1, 0, 0, 0},
-        {4, 2, 6, 0, 0, 0},
-        {5, 1, 8, 0, 0, 0},
-        {6, 2, 4, 0, 0, 0}};
+        {1, 0, 1, 0, 0, 0, 2},
+        {2, 1, 2, 0, 0, 0, 4},
+        {3, 2, 3, 0, 0, 0, 6},
+    };
 
     int n = arr.size();
 
@@ -72,10 +70,10 @@ int main()
     sort(arr.begin(), arr.end(), [](const vector<int> &a, const vector<int> &b)
          { return a[0] < b[0]; });
 
-    cout << "  PNo  AT   BT   CT  TAT   WT\n";
+    cout << "  PNo  AT   BT   CT  TAT   WT  I/O\n";
     for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < 6; j++)
+        for (int j = 0; j < 7; j++)
         {
             cout << setw(4) << arr[i][j] << " ";
         }
