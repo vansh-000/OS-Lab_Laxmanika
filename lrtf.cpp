@@ -1,66 +1,83 @@
 #include <iostream>
+#include <limits>
 using namespace std;
+class Process {
+public:
+    string processName;
+    int arrivalTime;
+    int burstTime;
+    int remainingTime;
+    int completionTime;
+    int waitingTime;
+    int turnAroundTime;
 
-struct Process {
-    int ID, AT, BT, remaining, CT, TAT, WT;
+    void initialize() {
+        remainingTime = burstTime;
+    }
 };
+int main() {
+    int numOfProcesses;
+    cout << "Enter number of processes: ";
+    cin >> numOfProcesses;
+    Process processes[numOfProcesses];
+    for (int n = 0; n < numOfProcesses; n++) {
+        cout << "\nEnter Process Name for " << (n + 1) << ": ";
+        cin >> processes[n].processName;
+        cout << "Enter Arrival Time for Process " << (n + 1) << ": ";
+        cin >> processes[n].arrivalTime;
+        cout << "Enter Burst Time for Process " << (n + 1) << ": ";
+        cin >> processes[n].burstTime;
 
-void LRTF(Process p[], int n) {
-    int time = 0, completed = 0;
-    float totalWT = 0, totalTAT = 0;
-
-    while (completed < n) {
-        int maxIndex = -1, maxRemaining = -1;
-
-        for (int i = 0; i < n; i++) {
-            if (p[i].AT <= time && p[i].remaining > 0) {
-                if (p[i].remaining > maxRemaining) {
-                    maxRemaining = p[i].remaining;
-                    maxIndex = i;
+        processes[n].initialize();
+    }
+    cout << "\n";
+    for (int i = 0; i < numOfProcesses - 1; i++) {
+        for (int j = i + 1; j < numOfProcesses; j++) {
+            if (processes[j].arrivalTime < processes[i].arrivalTime) {
+                swap(processes[j], processes[i]);
+            }
+        }
+    }
+    int currentTime = 0;
+    int completedProcesses = 0;
+    while (completedProcesses < numOfProcesses) {
+        int currentLongestJobIndex = -1;
+        int currentLongestJobRemainingTime = -1; 
+        for (int i = 0; i < numOfProcesses; i++) {
+            if (processes[i].remainingTime > 0 && processes[i].arrivalTime <= currentTime) {
+                if (processes[i].remainingTime > currentLongestJobRemainingTime) { 
+                    currentLongestJobRemainingTime = processes[i].remainingTime;
+                    currentLongestJobIndex = i;
                 }
             }
         }
-
-        if (maxIndex == -1) {
-            time++; // CPU remains idle
+        if (currentLongestJobIndex == -1) {
+            currentTime++;
             continue;
         }
-
-        p[maxIndex].remaining--;
-        time++;
-
-        if (p[maxIndex].remaining == 0) {
-            completed++;
-            p[maxIndex].CT = time;
-            p[maxIndex].TAT = p[maxIndex].CT - p[maxIndex].AT;
-            p[maxIndex].WT = p[maxIndex].TAT - p[maxIndex].BT;
-
-            totalWT += p[maxIndex].WT;
-            totalTAT += p[maxIndex].TAT;
+        processes[currentLongestJobIndex].remainingTime--;
+        currentTime++;
+        if (processes[currentLongestJobIndex].remainingTime == 0) {
+            processes[currentLongestJobIndex].completionTime = currentTime;
+            processes[currentLongestJobIndex].turnAroundTime =
+                processes[currentLongestJobIndex].completionTime - processes[currentLongestJobIndex].arrivalTime;
+            processes[currentLongestJobIndex].waitingTime =
+                processes[currentLongestJobIndex].turnAroundTime - processes[currentLongestJobIndex].burstTime;
+            completedProcesses++;
         }
     }
+    int sumWaitingTime = 0;
+    int sumTurnAroundTime = 0;
+    for (int n = 0; n < numOfProcesses; n++) {
+        cout << "\nProcess " << processes[n].processName << ":\n";
+        cout << "Completion Time: " << processes[n].completionTime << endl;
+        cout << "Waiting Time: " << processes[n].waitingTime << endl;
+        cout << "Turn Around Time: " << processes[n].turnAroundTime << "\n";
 
-    cout << "\nLRTF Scheduling Results:\n";
-    cout << "ID\tAT\tBT\tCT\tTAT\tWT\n";
-    for (int i = 0; i < n; i++) {
-        cout << p[i].ID << "\t" << p[i].AT << "\t" << p[i].BT << "\t"
-             << p[i].CT << "\t" << p[i].TAT << "\t" << p[i].WT << "\n";
+        sumWaitingTime += processes[n].waitingTime;
+        sumTurnAroundTime += processes[n].turnAroundTime;
     }
-
-    cout << "\n<WT> = " << (totalWT / n) << "\n";
-    cout << "<TAT> = " << (totalTAT / n) << "\n";
-}
-
-int main() {
-    const int n = 6;
-    Process p[n] = {
-        {1, 0, 5, 5, 0, 0, 0}, 
-        {2, 1, 3, 3, 0, 0, 0}, 
-        {3, 2, 8, 8, 0, 0, 0}, 
-        {4, 3, 6, 6, 0, 0, 0}, 
-        {5, 4, 2, 2, 0, 0, 0}, 
-        {6, 5, 4, 4, 0, 0, 0}
-    };
-
-    LRTF(p, n);
+    cout << "\n\nAverage Waiting Time: " << (float)sumWaitingTime / numOfProcesses;
+    cout << "\nAverage Turn Around Time: " << (float)sumTurnAroundTime / numOfProcesses << endl;
     return 0;
+}

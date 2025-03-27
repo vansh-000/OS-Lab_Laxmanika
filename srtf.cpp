@@ -1,86 +1,85 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <limits>
 using namespace std;
+class Process {
+public:
+    string processName;
+    int arrivalTime;
+    int burstTime;
+    int remainingTime;
+    int completionTime;
+    int waitingTime;
+    int turnAroundTime;
 
-void srtfScheduling(vector<vector<int>> &arr)
-{
-    int n = arr.size();
-    vector<int> remainingTime(n);
-    for (int i = 0; i < n; i++)
-        remainingTime[i] = arr[i][2];
+    void initialize() {
+        remainingTime = burstTime;
+    }
+};
+int main() {
+    int numOfProcesses;
+    cout << "Enter number of processes: ";
+    cin >> numOfProcesses;
+    Process processes[numOfProcesses];
 
-    int complete = 0, currentTime = 0, minRemainingTime = INT_MAX;
-    int shortest = -1, finishTime;
-    bool found = false;
+    for (int n = 0; n < numOfProcesses; n++) {
+        cout << "\nEnter Process Name for " << (n + 1) << ": ";
+        cin >> processes[n].processName;
+        cout << "Enter Arrival Time for Process " << (n + 1) << ": ";
+        cin >> processes[n].arrivalTime;
+        cout << "Enter Burst Time for Process " << (n + 1) << ": ";
+        cin >> processes[n].burstTime;
 
-    while (complete != n)
-    {
-        for (int i = 0; i < n; i++)
-        {
-            if (arr[i][1] <= currentTime && remainingTime[i] > 0 && remainingTime[i] < minRemainingTime)
-            {
-                minRemainingTime = remainingTime[i];
-                shortest = i;
-                found = true;
+        processes[n].initialize();
+    }
+    cout << "\n";
+    for (int i = 0; i < numOfProcesses - 1; i++) {
+        for (int j = i + 1; j < numOfProcesses; j++) {
+            if (processes[j].arrivalTime < processes[i].arrivalTime) {
+                swap(processes[j], processes[i]);
             }
         }
+    }
 
-        if (!found)
-        {
+    int currentTime = 0;
+    int completedProcesses = 0;
+
+    while (completedProcesses < numOfProcesses) {
+        int currentShortestJobIndex = -1;
+        int currentShortestJobRemainingTime = numeric_limits<int>::max();
+        for (int i = 0; i < numOfProcesses; i++) {
+            if (processes[i].remainingTime > 0 && processes[i].arrivalTime <= currentTime) {
+                if (processes[i].remainingTime < currentShortestJobRemainingTime) {
+                    currentShortestJobRemainingTime = processes[i].remainingTime;
+                    currentShortestJobIndex = i;}
+            }}
+        if (currentShortestJobIndex == -1) {
+
             currentTime++;
             continue;
         }
-
-        remainingTime[shortest]--;
-        minRemainingTime = remainingTime[shortest];
-
-        if (minRemainingTime == 0)
-            minRemainingTime = INT_MAX;
-
-        if (remainingTime[shortest] == 0)
-        {
-            complete++;
-            found = false;
-
-            finishTime = currentTime + 1;
-            arr[shortest][3] = finishTime;  // Completion time
-            arr[shortest][4] = arr[shortest][3] - arr[shortest][1]; // Turnaround time
-            arr[shortest][5] = arr[shortest][4] - arr[shortest][2]; // Waiting time
-        }
-
+        processes[currentShortestJobIndex].remainingTime--;
         currentTime++;
-    }
-}
-
-int main()
-{
-    // pNo,AT, BT, CT, TAT, WT
-    vector<vector<int>> arr = {
-        {1, 3, 4, 0, 0, 0},
-        {2, 4, 2, 0, 0, 0},
-        {3, 5, 1, 0, 0, 0},
-        {4, 2, 6, 0, 0, 0},
-        {5, 1, 8, 0, 0, 0},
-        {6, 2, 4, 0, 0, 0}};
-
-    int n = arr.size();
-
-    sort(arr.begin(), arr.end(), [](const vector<int> &a, const vector<int> &b)
-         { return a[1] < b[1]; });
-
-    srtfScheduling(arr);
-
-    sort(arr.begin(), arr.end(), [](const vector<int> &a, const vector<int> &b)
-         { return a[0] < b[0]; });
-
-    cout << "  PNo  AT   BT   CT  TAT   WT\n";
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < 6; j++)
-        {
-            cout << setw(4) << arr[i][j] << " ";
+        if (processes[currentShortestJobIndex].remainingTime == 0) {
+            processes[currentShortestJobIndex].completionTime = currentTime;
+            processes[currentShortestJobIndex].turnAroundTime =
+                processes[currentShortestJobIndex].completionTime - processes[currentShortestJobIndex].arrivalTime;
+            processes[currentShortestJobIndex].waitingTime =
+                processes[currentShortestJobIndex].turnAroundTime - processes[currentShortestJobIndex].burstTime;
+            completedProcesses++;
         }
-        cout << endl;
     }
+    int sumWaitingTime = 0;
+    int sumTurnAroundTime = 0;
+    for (int n = 0; n < numOfProcesses; n++) {
+        cout << "\nProcess " << processes[n].processName << ":\n";
+        cout << "Completion Time: " << processes[n].completionTime << endl;
+        cout << "Waiting Time: " << processes[n].waitingTime << endl;
+        cout << "Turn Around Time: " << processes[n].turnAroundTime << "\n";
 
+        sumWaitingTime += processes[n].waitingTime;
+        sumTurnAroundTime += processes[n].turnAroundTime;
+    }
+    cout << "\n\nAverage Waiting Time: " << (float)sumWaitingTime / numOfProcesses;
+    cout << "\nAverage Turn Around Time: " << (float)sumTurnAroundTime / numOfProcesses << endl;
     return 0;
 }
